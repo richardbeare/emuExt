@@ -3,7 +3,7 @@
 windows:
 	mkdir tmp
 	R CMD build --force emuExt
-	R INSTALL -l tmp emuExt_0.1.tar.gz
+	R CMD INSTALL -l tmp emuExt_0.1.tar.gz
 	(cd tmp; zip -r emuExt.zip emuExt;mv emuExt.zip ../)
  
 	${RM} -rf tmp
