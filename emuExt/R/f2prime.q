@@ -1,5 +1,12 @@
-f2prime <- function(f0, f2, f3, f4)
+## this probably isn't the most efficient way
+## of attacking this problem, but it will probably do the job
+f2prime.drv <- function(F)
   {
+    f0 <- F[1]
+    f2 <- F[2]
+    f3 <- F[3]
+    f4 <- F[4]
+
     f3mf2 <- f3 - f2
     f4mf3 <- f4 - f3
     f4mf2 <- f4 - f2
@@ -50,5 +57,20 @@ f2prime <- function(f0, f2, f3, f4)
       }
 
     wts <- find.weights()
-    (wts$w2*f2 + wts$w3*f3 + wts$w4*f4)/(1 + wts$w2 +wts$w3)
+    
+    (wts$w2*f2 + wts$w3*f3 + wts$w4*f4)/(wts$w2 + wts$w3 + wts$w4)
+  }
+
+## this function will accept any combination of vectors
+## and matrices, provided there are 4 columns in total.
+## The order of the columns is assumed to be f0, f2, f3, f4.
+f2prime <- function(f0, f2=NULL, f3=NULL, f4=NULL)
+  {
+    all <- cbind(f0, f2, f3, f4)
+
+    if (ncol(all) != 4) {
+      stop("4 input columns needed\n")
+    }
+    res <- apply(all, MARGIN=1, f2prime.drv)
+    res
   }
