@@ -159,3 +159,216 @@ function(x, y, colour = T, linetype = F, xlim = NULL, ylim = NULL, main = "",
 	}
 }
 ###################################################################################
+## new plotting routines -- currently they have stupid names. These "replace"
+## the dplot routines that seem to have become unreliable
+
+## support routines
+## convert to an object in which all tracks are the same length by sampling
+## the originals -- this uses emu's "linear" function
+normTracks <- function(tracks, samples=20, normlength=100)
+  {
+    if (class(tracks) != "trackdata") {
+      stop("Requires a trackdata object\n")
+    }
+
+    if (any(apply(is.na(tracks$data), MARGIN=2, all))) {
+      stop("A column of only NA's in data - conversion to normalised length won't work\n")
+    }
+    res <- linear(tracks, n=samples)
+    ## convert to a pretend trackdata object
+
+    ftime <- cbind(rep(0, nrow(tracks$index)),
+                   rep(normlength, nrow(tracks$index)))
+    res$ftime <- ftime
+    res$trackname <- "normalised"
+    class(res) <- class(tracks)
+    res
+  }
+
+## produces a track object with as many tracks as labels. Each track is an
+## average of all tracks with the same label in the original.
+## If the data is not normalised it will do it.
+aveTracks <- function(tracks, labels=stop("Labels must be present for averaging"),
+
+                  samples=20, normlength=100)
+  {
+    if (class(tracks) != "trackdata") {
+      stop("Requires a trackdata object\n")
+    }
+
+    IdxCount <- tracks$index[,2] - tracks$index[,1] + 1
+    if (length(unique(IdxCount)) != 1) {
+      cat("Data needs normalising - doing it\n")
+      newdata <- normTracks(tracks, samples=samples, normlength=normlength)
+    } else {
+      cat("Data already normalised\n")
+      samples <- IdxCount[1]
+      newdata <- tracks
+    }
+    ULabs <- unique(labels)
+    NCOL <- ncol(newdata$data)
+
+    if(is.null(NCOL)) NCOL <- 1
+
+    NewDat <- NULL
+    for (i in 1:length(ULabs)) {
+      these <- (labels == ULabs[i])
+      sub <- newdata[these,]
+      newres <- matrix(NA, nrow=samples, ncol=NCOL)
+      for (j in 1:NCOL) {
+        dat <- sub[,j]$data
+        dim(dat) <- c(samples, length(dat)/samples)
+        newres[,j] <- apply(dat, MARGIN=1, mean)
+      }
+      NewDat <- rbind(NewDat, newres)
+    }
+    NewIdx <- ((0:(length(ULabs)-1)) * samples) + 1
+    NewIdx <- cbind(NewIdx, NewIdx + samples -1)
+    NewFtime <- newdata$ftime[1:length(ULabs), ]
+    newtrack <- list(data=NewDat, index=NewIdx, ftime=NewFtime, trackname="averaged")
+    class(newtrack) <- class(tracks)
+    return(list(track=newtrack, labels=ULabs))
+  }
+
+## plot tracks against time
+plotTracks <- function(tracks, labels=NULL, xlab="time (ms)",
+                       ylab="", legn="tl")
+  {
+    ## plot the unaveraged versions
+    if (class(tracks) != "trackdata") {
+      stop("Requires a trackdata object\n")
+    }
+
+
+    NewFtime <- tracks$ftime - tracks$ftime[,1]
+    IdxCount <- tracks$index[,2] - tracks$index[,1] + 1
+    StartI <- tracks$index[,1]
+    EndI <- tracks$index[,2]
+
+    xrange <- range(NewFtime)
+    tt <- !is.na(tracks$data)
+    yrange <- range(tracks$data[tt])
+    NROWS <- nrow(tracks$index)
+    if (is.null(labels)) {
+      ThisColor <- rep(1, NROWS)
+    } else {
+      ULabs <- unique(labels)
+      ThisColor <- match(labels, ULabs)
+    }
+    xIdx <- function(idx){
+        seq(from=NewFtime[idx, 1], to=NewFtime[idx, 2], length=IdxCount[idx])
+      }
+    ## set up the axes etc
+    plot(xIdx(1), tracks[1,1]$data, xlim=xrange, ylim=yrange, xlab=xlab,
+         ylab=ylab, type='n')
+
+    ## now plot the data
+    plotSingle <- function(r, c) {
+      dd <- tracks$data[StartI[r]:EndI[r], c]
+      lines(xIdx(r), dd, col=ThisColor[r])
+    }
+    for (i in 1:ncol(tracks$data)) {
+      lapply(1:NROWS, plotSingle, i)
+    }
+    ## legend
+    LegPos <- mu.legend(legn, xrange, yrange)
+    if (!is.null(labels)) {
+      legend(LegPos$x, LegPos$y, ULabs, col=1:length(ULabs), lty=1)
+    }
+  }
+
+plotAveTracks <- function(tracks, labels=stop("Labels must be present for averaging"),
+                  xlab="time (ms)", ylab="", legn="tl",
+                  samples=20, normlength=100)
+  {
+    atracks <- aveTracks(tracks, labels=labels, samples=samples,
+                         normlength=normlength)
+    newtracks <- atracks$track
+    ULabs <- atracks$labels
+    plotTracks(atrack, labels=ULabs, xlab=xlab, ylab=ylab, legn=legn)
+    invisible()
+  }
+
+plotXYTrack <- function(tracksx, tracksy, labels=NULL, xlab="", ylab="", legn="tl",
+                 velMarkers=TRUE, markStart=TRUE)
+  {
+    if ((class(tracksx) != "trackdata") | (class(tracksy) != "trackdata") ) {
+      stop("Requires two trackdata objects\n")
+    }
+
+    if (ncol(tracksx$data) != ncol(tracksy$data)) {
+      stop("Number of columns in tracksx and tracksy must be the same\n")
+    }
+
+    if (ncol(tracksx$data) != ncol(tracksy$data)) {
+      stop("Sample lengths must be identical\n")
+    }
+    NewFtime <- tracksx$ftime - tracksy$ftime[,1]
+    IdxCount <- tracksx$index[,2] - tracksx$index[,1] + 1
+    StartI <- tracksx$index[,1]
+    EndI <- tracksx$index[,2]
+
+    tt <- !is.na(tracksx$data)
+    xrange <- range(tracksx$data[tt])
+    tt <- !is.na(tracksy$data)
+    yrange <- range(tracksy$data[tt])
+    NROWS <- nrow(tracksx$index)
+
+    if (is.null(labels)) {
+      ThisColor <- rep(1, NROWS)
+    } else {
+      ULabs <- unique(labels)
+      ThisColor <- match(labels, ULabs)
+    }
+    ## set up the plot canvas
+    plot(tracksx[1,1]$data, tracksy[1,1]$data, xlim=xrange, ylim=yrange,
+         xlab=xlab, ylab=ylab, type='n')
+
+    if (velMarkers) {
+      plotSingle <- function(r,c) {
+        ddx <- tracksx$data[StartI[r]:EndI[r], c]
+        ddy <- tracksy$data[StartI[r]:EndI[r], c]
+        lines(ddx, ddy, col=ThisColor[r])
+        points(ddx, ddy, col=ThisColor[r], pch=ThisColor[r])
+        if (markStart) {
+          text(ddx[1], ddy[1], labels="s", col=ThisColor[r], pos=2)
+        }
+      }
+    } else {
+      plotSingle <- function(r,c) {
+        ddx <- tracksx$data[StartI[r]:EndI[r], c]
+        ddy <- tracksy$data[StartI[r]:EndI[r], c]
+        lines(ddx, ddy, col=ThisColor[r])
+        if (markStart) {
+          text(ddx[1], ddy[1], labels="s", col=ThisColor[r], pos=2)
+        }
+      }
+    }
+
+    for (i in 1:ncol(tracksx$data)) {
+      lapply(1:NROWS, plotSingle, i)
+    }
+    ## legend
+    LegPos <- mu.legend(legn, xrange, yrange)
+    if (!is.null(labels)) {
+      if (velMarkers) {
+        legend(LegPos$x, LegPos$y, ULabs, col=1:length(ULabs), pch=1:length(ULabs), lty=1)
+      } else {
+        legend(LegPos$x, LegPos$y, ULabs, col=1:length(ULabs), lty=1)
+      }
+    }
+
+  }
+
+plotXYAveTrack <- function(tracksx, tracksy,
+                    labels=stop("Labels must be present for averaging"),
+                    xlab="", ylab="", legn="tl", velMarkers=TRUE, markStart=TRUE,
+                    samples=20, normlength=100)
+  {
+    aveX <- aveTracks(tracksx, labels=labels, samples=samples,
+                      normlength=normlength)
+    aveY <- aveTracks(tracksy, labels=labels, samples=samples,
+                      normlength=normlength)
+    plotXYTrack(aveX$track, aveY$track, aveX$labels, xlab=xlab, ylab=ylab, velMarkers=velMarkers, markStart=markStart)
+
+  }

@@ -40,3 +40,38 @@ dlowess <- function(dataset, window=1/3)
     dapply(dataset, lowess.sub, window)
   }
 
+dloess <- function(dataset, window=1/3)
+  {
+    loess.sub <- function(data, ftime, window)
+      {
+        a <- data
+        for (i in 1:dim(data)[2]) {
+          bb <- data.frame(x=1:nrow(a), y=as.vector(data[,i]))
+          sm <- loess(y~x, bb, span = window)
+          a[, i] <- predict(sm, bb)
+        }
+        list(data = a, ftime = ftime)
+
+      }
+
+    dapply(dataset, loess.sub, window)
+  }
+
+## this converts the data produced by a track query to numeric if required
+m.emu.track <- function(...)
+  {
+    ff <- emu.track(...)
+    if (storage.mode(ff)=="character") {
+      dd <- dim(ff)
+      ff <- as.numeric(ff)
+      dim(ff) <- dd
+    } else {
+      if (storage.mode(ff$data)=="character") {
+        dd <- dim(ff$data)
+        ff$data <- as.numeric(ff$data)
+        dim(ff$data) <- dd
+      }
+    }
+    ff
+  }
+
