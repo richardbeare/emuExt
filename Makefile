@@ -2,12 +2,14 @@
 
 windows:
 	mkdir tmp
-	R INSTALL -l tmp emuExt
+	R CMD build --force emuExt
+	R INSTALL -l tmp emuExt_0.1.tar.gz
 	(cd tmp; zip -r emuExt.zip emuExt;mv emuExt.zip ../)
  
 	${RM} -rf tmp
 
 unix:
-	tar czf emuExt.tgz emuExt
+	R CMD build --force emuExt
+##tar czf emuExt.tgz emuExt
 
 all: windows unix
