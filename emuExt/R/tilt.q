@@ -21,7 +21,7 @@
 
 spectral.tilt <- function(dataset, lsweight=F, plotduring=T,
                           window=12, frameShift=5, bt=1000,
-                          tp=5000, firstOnly=F, do.tilt=T, do.moments=T)
+                          tp=5000, firstOnly=F, do.tilt=T, do.moments=T, use.erb=F)
   {
     sp.sub <- function(I, DS)
       {
@@ -48,7 +48,12 @@ spectral.tilt <- function(dataset, lsweight=F, plotduring=T,
         f<-((1:(winlen))*(freq/winlen))[fstart:fend]
         erb <- 21.4 * log10(f*0.00437 + 1)
 
-        fsqr <- f^2
+        if (use.erb) {
+          fff <- erb
+        } else {
+          fff <- f
+        }
+        fsqr <- fff^2
         ## only do the first window in each token
         ## naturally the secondary regression
         ## will be empty
@@ -75,7 +80,7 @@ spectral.tilt <- function(dataset, lsweight=F, plotduring=T,
             
             if (do.moments) {
               FTdbn <- FTdb - min(FTdb)
-              prodvals <- FTdbn * f
+              prodvals <- FTdbn * fff
               s1 <- sum(FTdbn)
               s2 <- sum(prodvals)
               first.moment <- s2/s1
@@ -135,14 +140,15 @@ spectral.tilt <- function(dataset, lsweight=F, plotduring=T,
 
 spect.utter<-function(utt.list, lsweight=F, plotduring=TRUE,
                       window=12, frameShift=5, bt=1000,
-                      tp=5000, firstOnly=F, do.tilt=T, do.moments=T)
+                      tp=5000, firstOnly=F, do.tilt=T, do.moments=T,
+                      use.erb=F)
   {
     samdat<-emu.track(utt.list, "samples")
     o<-spectral.tilt(dataset=samdat, lsweight=lsweight,
                      plotduring=plotduring,
                      window=window, frameShift=frameShift,
                      bt=bt, tp=tp, firstOnly=firstOnly,
-                     do.tilt=do.tilt, do.moments=do.moments)
+                     do.tilt=do.tilt, do.moments=do.moments, use.erb=use.erb)
     PP <- unlist(o$moments)
     dim(PP) <- c(2,length(PP)/2)
     
