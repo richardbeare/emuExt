@@ -1,4 +1,4 @@
-dplot.norm"<- function(dataset, labs = NULL, average = F,
+"dplot.norm"<- function(dataset, labs = NULL, average = F,
                         main = "", xlab = "time (ms)", ylab = "",
                         xlim = NULL, ylim = NULL, cex = 0.5,
                         linetype = F, colour = T,
