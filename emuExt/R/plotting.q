@@ -232,7 +232,7 @@ aveTracks <- function(tracks, labels=stop("Labels must be present for averaging"
 
 ## plot tracks against time
 plotTracks <- function(tracks, labels=NULL, xlab="time (ms)",
-                       ylab="", legn="tl")
+                       ylab="", main="", legn="tl")
   {
     ## plot the unaveraged versions
     if (class(tracks) != "trackdata") {
@@ -260,7 +260,7 @@ plotTracks <- function(tracks, labels=NULL, xlab="time (ms)",
       }
     ## set up the axes etc
     plot(xIdx(1), tracks[1,1]$data, xlim=xrange, ylim=yrange, xlab=xlab,
-         ylab=ylab, type='n')
+         ylab=ylab, main=main, type='n')
 
     ## now plot the data
     plotSingle <- function(r, c) {
@@ -278,18 +278,18 @@ plotTracks <- function(tracks, labels=NULL, xlab="time (ms)",
   }
 
 plotAveTracks <- function(tracks, labels=stop("Labels must be present for averaging"),
-                  xlab="time (ms)", ylab="", legn="tl",
+                  xlab="time (ms)", ylab="", main="", legn="tl",
                   samples=20, normlength=100)
   {
     atracks <- aveTracks(tracks, labels=labels, samples=samples,
                          normlength=normlength)
     newtracks <- atracks$track
     ULabs <- atracks$labels
-    plotTracks(atrack, labels=ULabs, xlab=xlab, ylab=ylab, legn=legn)
+    plotTracks(newtracks, labels=ULabs, xlab=xlab, ylab=ylab, main=main, legn=legn)
     invisible()
   }
 
-plotXYTrack <- function(tracksx, tracksy, labels=NULL, xlab="", ylab="", legn="tl",
+plotXYTrack <- function(tracksx, tracksy, labels=NULL, xlab="", ylab="", main="", legn="tl",
                  velMarkers=TRUE, markStart=TRUE)
   {
     if ((class(tracksx) != "trackdata") | (class(tracksy) != "trackdata") ) {
@@ -322,7 +322,7 @@ plotXYTrack <- function(tracksx, tracksy, labels=NULL, xlab="", ylab="", legn="t
     }
     ## set up the plot canvas
     plot(tracksx[1,1]$data, tracksy[1,1]$data, xlim=xrange, ylim=yrange,
-         xlab=xlab, ylab=ylab, type='n')
+         xlab=xlab, ylab=ylab, main=main, type='n')
 
     if (velMarkers) {
       plotSingle <- function(r,c) {
@@ -362,13 +362,13 @@ plotXYTrack <- function(tracksx, tracksy, labels=NULL, xlab="", ylab="", legn="t
 
 plotXYAveTrack <- function(tracksx, tracksy,
                     labels=stop("Labels must be present for averaging"),
-                    xlab="", ylab="", legn="tl", velMarkers=TRUE, markStart=TRUE,
+                    xlab="", ylab="", main="", legn="tl", velMarkers=TRUE, markStart=TRUE,
                     samples=20, normlength=100)
   {
     aveX <- aveTracks(tracksx, labels=labels, samples=samples,
                       normlength=normlength)
     aveY <- aveTracks(tracksy, labels=labels, samples=samples,
                       normlength=normlength)
-    plotXYTrack(aveX$track, aveY$track, aveX$labels, xlab=xlab, ylab=ylab, velMarkers=velMarkers, markStart=markStart)
+    plotXYTrack(aveX$track, aveY$track, aveX$labels, xlab=xlab, ylab=ylab, main=main, velMarkers=velMarkers, markStart=markStart, legn=legn)
 
   }
