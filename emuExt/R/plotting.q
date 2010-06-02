@@ -92,71 +92,71 @@
 ###################################################################################
 
 "xyplot"<-
-function(x, y, colour = T, linetype = F, xlim = NULL, ylim = NULL, main = "", 
-	xlab = "displacement (mm)", ylab = "displacement (mm)", timelims = NULL,
-	legn = "br", type = "l", marktime = NULL, marklab = NULL, defaultcolour
-	 = 1, pch = "b", arrow = NULL, rel = F, size = 0.2, timestamp=T)
+  function(x, y, colour = T, linetype = F, xlim = NULL, ylim = NULL, main = "", 
+           xlab = "displacement (mm)", ylab = "displacement (mm)", timelims = NULL,
+           legn = "br", type = "l", marktime = NULL, marklab = NULL, defaultcolour
+           = 1, pch = "b", arrow = NULL, rel = F, size = 0.2, timestamp=T)
 {
-# arrow a list with components
-# $time: time in ms at which the arrowhead should be drawn
-# optionally $size: a vector in inches of the size of
-# the arrowhead
-	labs <- x$labs
-	xdata <- x$data[[1]]
-	ydata <- y$data[[1]]
-	if(!is.null(timelims)) {
-		temp <- (x$time >= timelims[1]) & (x$time <= timelims[2])
-		xdata <- xdata[, temp]
-		ydata <- ydata[, temp]
-		x$time <- x$time[temp]
-		if(!is.matrix(xdata)) {
-			xdata <- rbind(xdata)
-			ydata <- rbind(ydata)
-		}
-	}
-	if(is.null(xlim))
-		xlim <- range(xdata, na.rm = T)
-	if(is.null(ylim))
-		ylim <- range(ydata, na.rm = T)
-	col.lty <- mu.colour(labs, colour, linetype, defaultcolour = 
-		defaultcolour)
-	mark.lty <- mu.colour(labs, colour, timestamp, defaultcolour = 
-		defaultcolour)
+                                        # arrow a list with components
+                                        # $time: time in ms at which the arrowhead should be drawn
+                                        # optionally $size: a vector in inches of the size of
+                                        # the arrowhead
+  labs <- x$labs
+  xdata <- x$data[[1]]
+  ydata <- y$data[[1]]
+  if(!is.null(timelims)) {
+    temp <- (x$time >= timelims[1]) & (x$time <= timelims[2])
+    xdata <- xdata[, temp]
+    ydata <- ydata[, temp]
+    x$time <- x$time[temp]
+    if(!is.matrix(xdata)) {
+      xdata <- rbind(xdata)
+      ydata <- rbind(ydata)
+    }
+  }
+  if(is.null(xlim))
+    xlim <- range(xdata, na.rm = T)
+  if(is.null(ylim))
+    ylim <- range(ydata, na.rm = T)
+  col.lty <- mu.colour(labs, colour, linetype, defaultcolour = 
+                       defaultcolour)
+  mark.lty <- mu.colour(labs, colour, timestamp, defaultcolour = 
+                        defaultcolour)
 
-	for(j in 1:nrow(xdata)) {
-		plot(xdata[j,  ], ydata[j,  ], xlim = xlim, ylim = ylim, xlab
-			 = "", ylab = "", col = col.lty$colour[j], lty = 
-			col.lty$linetype[j], type = type, pch = pch)
-            if (timestamp)
-              points(xdata[j,  ], ydata[j,  ], col = mark.lty$colour[j], pch = mark.lty$linetype[j])
+  for(j in 1:nrow(xdata)) {
+    plot(xdata[j,  ], ydata[j,  ], xlim = xlim, ylim = ylim, xlab
+         = "", ylab = "", col = col.lty$colour[j], lty = 
+         col.lty$linetype[j], type = type, pch = pch)
+    if (timestamp)
+      points(xdata[j,  ], ydata[j,  ], col = mark.lty$colour[j], pch = mark.lty$linetype[j])
 
-		if(is.list(arrow)) {
-			temp <- closest(x$time, arrow$time)
-			if(!any(arrow$size))
-				arrow$size <- 0.2
-			arrows(xdata[j, temp - 1], ydata[j, temp - 1], xdata[j, 
-				temp], ydata[j, temp])
-		}
-		if(!is.null(marktime)) {
-			for(i in 1:length(marktime)) {
-				if(is.null(marklab))
-				  marklab <- rep("X", length(marktime))
-				temp <- closest(x$time, marktime[i])
-				text(xdata[j, temp], ydata[j, temp], marklab[i],
-				  col = colour[j])
-			}
-		}
-		par(new = T)
-	}
-		
-	title(main = main, xlab = xlab, ylab = ylab)
-	if(legn != F) {
-		legn <- mu.legend(legn, xlim, ylim)
-            if (timestamp) PCH<- mark.lty$linetype 
-            else PCH <- NULL
-		legend(legn$x, legn$y, legend = as.character(col.lty$legend$lab
-			), col = col.lty$legend$col, lty = col.lty$legend$lty, pch = PCH)
-	}
+    if(is.list(arrow)) {
+      temp <- closest(x$time, arrow$time)
+      if(!any(arrow$size))
+        arrow$size <- 0.2
+      arrows(xdata[j, temp - 1], ydata[j, temp - 1], xdata[j, 
+                                                           temp], ydata[j, temp])
+    }
+    if(!is.null(marktime)) {
+      for(i in 1:length(marktime)) {
+        if(is.null(marklab))
+          marklab <- rep("X", length(marktime))
+        temp <- closest(x$time, marktime[i])
+        text(xdata[j, temp], ydata[j, temp], marklab[i],
+             col = colour[j])
+      }
+    }
+    par(new = T)
+  }
+  
+  title(main = main, xlab = xlab, ylab = ylab)
+  if(legn != F) {
+    legn <- mu.legend(legn, xlim, ylim)
+    if (timestamp) PCH<- mark.lty$linetype 
+    else PCH <- NULL
+    legend(legn$x, legn$y, legend = as.character(col.lty$legend$lab
+                             ), col = col.lty$legend$col, lty = col.lty$legend$lty, pch = PCH)
+  }
 }
 ###################################################################################
 ## new plotting routines -- currently they have stupid names. These "replace"
@@ -190,7 +190,7 @@ normTracks <- function(tracks, samples=20, normlength=100)
 ## If the data is not normalised it will do it.
 aveTracks <- function(tracks, labels=stop("Labels must be present for averaging"),
 
-                  samples=20, normlength=100)
+                      samples=20, normlength=100)
   {
     if (class(tracks) != "trackdata") {
       stop("Requires a trackdata object\n")
@@ -256,8 +256,8 @@ plotTracks <- function(tracks, labels=NULL, xlab="time (ms)",
       ThisColor <- match(labels, ULabs)
     }
     xIdx <- function(idx){
-        seq(from=NewFtime[idx, 1], to=NewFtime[idx, 2], length=IdxCount[idx])
-      }
+      seq(from=NewFtime[idx, 1], to=NewFtime[idx, 2], length=IdxCount[idx])
+    }
     ## set up the axes etc
     plot(xIdx(1), tracks[1,1]$data, xlim=xrange, ylim=yrange, xlab=xlab,
          ylab=ylab, main=main, type='n')
@@ -278,8 +278,8 @@ plotTracks <- function(tracks, labels=NULL, xlab="time (ms)",
   }
 
 plotAveTracks <- function(tracks, labels=stop("Labels must be present for averaging"),
-                  xlab="time (ms)", ylab="", main="", legn="tl",
-                  samples=20, normlength=100)
+                          xlab="time (ms)", ylab="", main="", legn="tl",
+                          samples=20, normlength=100)
   {
     atracks <- aveTracks(tracks, labels=labels, samples=samples,
                          normlength=normlength)
@@ -293,9 +293,9 @@ createLabColors <- function(labels)
   {
     ## creates a vector of labels suitable for plotXYTrack and plotXYAveTrack
     distinct.colors <- colors()[c(552, 257, 26, 68, 450, 91, 81, 31, 36,
-                                490, 656, 642, 572, 639, 587, 96, 614,
-                                476, 506, 429, 594, 117, 12,
-                                563, 633, 461, 645, 84, 640, 556)]
+                                  490, 656, 642, 572, 639, 587, 96, 614,
+                                  476, 506, 429, 594, 117, 12,
+                                  563, 633, 461, 645, 84, 640, 556)]
     if (length(labels) > length(distinct.colors)) {
       stop("Not enough colours")
     }
@@ -305,132 +305,154 @@ createLabColors <- function(labels)
   }
 
 plotXYTrack <- function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "", 
-    main = "", legn = "tl", velMarkers = TRUE, markStart = TRUE, 
-    palaisX = NULL, palaisY = NULL, doColor=TRUE, labColours=NULL) 
+                         main = "", legn = "tl", velMarkers = TRUE, markStart = TRUE,
+                         markEnd = TRUE, markMid = TRUE,
+                         palaisX = NULL, palaisY = NULL, doColor=TRUE, labColours=NULL) 
 {
-    if ((class(tracksx) != "trackdata") | (class(tracksy) != 
-        "trackdata")) {
-        stop("Requires two trackdata objects\n")
-    }
-    if (ncol(tracksx$data) != ncol(tracksy$data)) {
-        stop("Number of columns in tracksx and tracksy must be the same\n")
-    }
-    if (ncol(tracksx$data) != ncol(tracksy$data)) {
-        stop("Sample lengths must be identical\n")
-    }
-    NewFtime <- tracksx$ftime - tracksy$ftime[, 1]
-    IdxCount <- tracksx$index[, 2] - tracksx$index[, 1] + 1
-    StartI <- tracksx$index[, 1]
-    EndI <- tracksx$index[, 2]
-    tt <- !is.na(tracksx$data)
-    if (is.null(palaisX)) {
-        xrange <- range(tracksx$data[tt])
-    }
-    else {
-        xrange <- range(c(tracksx$data[tt], palaisX))
-    }
-    tt <- !is.na(tracksy$data)
-    if (is.null(palaisY)) {
-        yrange <- range(tracksy$data[tt])
-    }
-    else {
-        yrange <- range(c(tracksy$data[tt], palaisY))
-    }
-    NROWS <- nrow(tracksx$index)
-    if (doColor) {
-      if (is.null(labels)) {
-        ThisColor <- rep(1, NROWS)
-      } else {
-        ULabs <- unique(labels)
-        if (is.null(labColours)) {
-          ## use some default colours. These aren't going to match labels between plots  
-          ThisColor <- match(labels, ULabs)
-        } else {
-          ## use a user defined set of labels. This should be a vector of colour indexes
-          ## with names corresponding to labels. Use createLabColors(labels)
-          ThisColor <- labColours[labels]
-        }
-      }
-    } else {
-      if (!is.null(labels))
-        ULabs <- unique(labels)
-      ThisColor <- rep(1, NROWS)
-    }
-
+  if ((class(tracksx) != "trackdata") | (class(tracksy) != 
+              "trackdata")) {
+    stop("Requires two trackdata objects\n")
+  }
+  if (ncol(tracksx$data) != ncol(tracksy$data)) {
+    stop("Number of columns in tracksx and tracksy must be the same\n")
+  }
+  if (ncol(tracksx$data) != ncol(tracksy$data)) {
+    stop("Sample lengths must be identical\n")
+  }
+  NewFtime <- tracksx$ftime - tracksy$ftime[, 1]
+  IdxCount <- tracksx$index[, 2] - tracksx$index[, 1] + 1
+  StartI <- tracksx$index[, 1]
+  EndI <- tracksx$index[, 2]
+  tt <- !is.na(tracksx$data)
+  if (is.null(palaisX)) {
+    xrange <- range(tracksx$data[tt])
+  }
+  else {
+    xrange <- range(c(tracksx$data[tt], palaisX))
+  }
+  tt <- !is.na(tracksy$data)
+  if (is.null(palaisY)) {
+    yrange <- range(tracksy$data[tt])
+  }
+  else {
+    yrange <- range(c(tracksy$data[tt], palaisY))
+  }
+  NROWS <- nrow(tracksx$index)
+  if (doColor) {
     if (is.null(labels)) {
-      plotChar <- rep(1, NROWS)
+      ThisColor <- rep(1, NROWS)
     } else {
+      ULabs <- unique(labels)
       if (is.null(labColours)) {
-         plotChar <- 1:length(ULabs)
+        ## use some default colours. These aren't going to match labels between plots  
+        ThisColor <- match(labels, ULabs)
       } else {
-         dd <- 1:length(labColours)
-         names(dd) <- names(labColours)
-         plotChar <- dd[labels]
+        ## use a user defined set of labels. This should be a vector of colour indexes
+        ## with names corresponding to labels. Use createLabColors(labels)
+        ThisColor <- labColours[labels]
       }
     }
-    
-    
-    plot(tracksx[1, 1]$data, tracksy[1, 1]$data, xlim = xrange, 
-        ylim = yrange, xlab = xlab, ylab = ylab, main = main, 
-        type = "n")
-    if (!is.null(palaisX) & !is.null(palaisY)) {
-        lines(palaisX, palaisY)
+  } else {
+    if (!is.null(labels))
+      ULabs <- unique(labels)
+    ThisColor <- rep(1, NROWS)
+  }
+
+  if (is.null(labels)) {
+    plotChar <- rep(1, NROWS)
+  } else {
+    if (is.null(labColours)) {
+      plotChar <- 1:length(ULabs)
+    } else {
+      dd <- 1:length(labColours)
+      names(dd) <- names(labColours)
+      plotChar <- dd[labels]
     }
+  }
+  
+  
+  plot(tracksx[1, 1]$data, tracksy[1, 1]$data, xlim = xrange, 
+       ylim = yrange, xlab = xlab, ylab = ylab, main = main, 
+       type = "n")
+  if (!is.null(palaisX) & !is.null(palaisY)) {
+    lines(palaisX, palaisY)
+  }
+  if (velMarkers) {
+    plotSingle <- function(r, c) {
+      ddx <- tracksx$data[StartI[r]:EndI[r], c]
+      ddy <- tracksy$data[StartI[r]:EndI[r], c]
+      lines(ddx, ddy, col = ThisColor[r])
+      points(ddx, ddy, col = ThisColor[r], pch = plotChar[r])
+      if (markStart) {
+        text(ddx[1], ddy[1], labels = "s", col = ThisColor[r], 
+             pos = 2)
+      }
+      if (markEnd) {
+        ll <- length(ddx)
+        text(ddx[ll], ddy[ll], labels = "e", col = ThisColor[r], 
+             pos = 2)
+      }
+      if (markMid) {
+        ll <- round(length(ddx)/2)
+        text(ddx[ll], ddy[ll], labels = "m", col = ThisColor[r], 
+             pos = 2)
+      }
+    }
+  }
+  else {
+    plotSingle <- function(r, c) {
+      ddx <- tracksx$data[StartI[r]:EndI[r], c]
+      ddy <- tracksy$data[StartI[r]:EndI[r], c]
+      lines(ddx, ddy, col = ThisColor[r])
+      if (markStart) {
+        text(ddx[1], ddy[1], labels = "s", col = ThisColor[r], 
+             pos = 2)
+      }
+      if (markEnd) {
+        ll <- length(ddx)
+        text(ddx[ll], ddy[ll], labels = "e", col = ThisColor[r], 
+             pos = 2)
+      }
+      if (markMid) {
+        ll <- round(length(ddx)/2)
+        text(ddx[ll], ddy[ll], labels = "m", col = ThisColor[r], 
+             pos = 2)
+      }           
+    }
+  }
+  for (i in 1:ncol(tracksx$data)) {
+    lapply(1:NROWS, plotSingle, i)
+  }
+  LegPos <- mu.legend(legn, xrange, yrange)
+  if (!is.null(labels)) {
     if (velMarkers) {
-        plotSingle <- function(r, c) {
-            ddx <- tracksx$data[StartI[r]:EndI[r], c]
-            ddy <- tracksy$data[StartI[r]:EndI[r], c]
-            lines(ddx, ddy, col = ThisColor[r])
-            points(ddx, ddy, col = ThisColor[r], pch = plotChar[r])
-            if (markStart) {
-                text(ddx[1], ddy[1], labels = "s", col = ThisColor[r], 
-                  pos = 2)
-            }
-        }
+      legend(LegPos$x, LegPos$y, ULabs, col = ThisColor, 
+             pch = plotChar, lty = 1)
     }
     else {
-        plotSingle <- function(r, c) {
-            ddx <- tracksx$data[StartI[r]:EndI[r], c]
-            ddy <- tracksy$data[StartI[r]:EndI[r], c]
-            lines(ddx, ddy, col = ThisColor[r])
-            if (markStart) {
-                text(ddx[1], ddy[1], labels = "s", col = ThisColor[r], 
-                  pos = 2)
-            }
-        }
+      legend(LegPos$x, LegPos$y, ULabs, col = ThisColor, 
+             lty = 1)
     }
-    for (i in 1:ncol(tracksx$data)) {
-        lapply(1:NROWS, plotSingle, i)
-    }
-    LegPos <- mu.legend(legn, xrange, yrange)
-    if (!is.null(labels)) {
-        if (velMarkers) {
-            legend(LegPos$x, LegPos$y, ULabs, col = ThisColor, 
-                pch = plotChar, lty = 1)
-        }
-        else {
-            legend(LegPos$x, LegPos$y, ULabs, col = ThisColor, 
-                lty = 1)
-        }
-    }
+  }
 }
 
 plotXYAveTrack <- function (tracksx, tracksy, labels = stop("Labels must be present for averaging"), 
-    xlab = "", ylab = "", main = "", legn = "tl", velMarkers = TRUE, 
-    markStart = TRUE, samples = 20, normlength = 100, palaisX = NULL, 
-    palaisY = NULL, doColor=TRUE, labColours=NULL) 
+                            xlab = "", ylab = "", main = "", legn = "tl", velMarkers = TRUE, 
+                            markStart = TRUE, markEnd = TRUE, markMid = TRUE, samples = 20, normlength = 100, palaisX = NULL, 
+                            palaisY = NULL, doColor=TRUE, labColours=NULL) 
 {
-    aveX <- aveTracks(tracksx, labels = labels, samples = samples, 
-        normlength = normlength)
-    aveY <- aveTracks(tracksy, labels = labels, samples = samples, 
-        normlength = normlength)
-    if (!is.null(palaisX) & !is.null(palaisY)) {
-        palaisX <- lowess(palaisX, f = 1/10)$y
-        palaisY <- lowess(palaisY, f = 1/10)$y
-    }
-    plotXYTrack(aveX$track, aveY$track, aveX$labels, xlab = xlab, 
-        ylab = ylab, main = main, velMarkers = velMarkers, markStart = markStart, 
-        legn = legn, palaisX = palaisX, palaisY = palaisY, doColor=doColor, labColours=labColours)
+  aveX <- aveTracks(tracksx, labels = labels, samples = samples, 
+                    normlength = normlength)
+  aveY <- aveTracks(tracksy, labels = labels, samples = samples, 
+                    normlength = normlength)
+  if (!is.null(palaisX) & !is.null(palaisY)) {
+    palaisX <- lowess(palaisX, f = 1/10)$y
+    palaisY <- lowess(palaisY, f = 1/10)$y
+  }
+  plotXYTrack(aveX$track, aveY$track, aveX$labels, xlab = xlab, 
+              ylab = ylab, main = main, velMarkers = velMarkers, markStart = markStart,
+              markEnd = markEnd, markMid=markMid,
+              legn = legn, palaisX = palaisX, palaisY = palaisY, doColor=doColor, labColours=labColours)
 }
 
 
@@ -451,30 +473,30 @@ euclidDist <- function(xdata, ydata, toplip, bottomlip,
 
   result <- NULL
   for (j in 1:nrow(xdata$ftime)) {
-     xt <- xdata[j, toplip]$data
-     yt <- ydata[j, toplip]$data
-     xb <- xdata[j, bottomlip]$data
-     yb <- ydata[j, bottomlip]$data
-     sampTime <- xdata[j, ]$ftime
-     timesPos <- seq(sampTime[1], sampTime[2], length = nrow(xt))
-     edist <- sqrt((xt - xb)^2 + (yt - yb)^2)
-     mpos <- which.min(edist)
-     val <- edist[mpos]
-     # return data
-     result <- rbind(result, c(val, timesPos[mpos]))
-     maintext <- paste("Token ", j, ":" )
-     if (!is.null(LabelList)) {
-       for (i in LabelList) {
-          maintext <- paste(maintext, i[j])
-       }
-     }
+    xt <- xdata[j, toplip]$data
+    yt <- ydata[j, toplip]$data
+    xb <- xdata[j, bottomlip]$data
+    yb <- ydata[j, bottomlip]$data
+    sampTime <- xdata[j, ]$ftime
+    timesPos <- seq(sampTime[1], sampTime[2], length = nrow(xt))
+    edist <- sqrt((xt - xb)^2 + (yt - yb)^2)
+    mpos <- which.min(edist)
+    val <- edist[mpos]
+                                        # return data
+    result <- rbind(result, c(val, timesPos[mpos]))
+    maintext <- paste("Token ", j, ":" )
+    if (!is.null(LabelList)) {
+      for (i in LabelList) {
+        maintext <- paste(maintext, i[j])
+      }
+    }
 
-     plot(timesPos, edist, main=maintext)
-     points(timesPos[mpos], val, pch=2, col="blue")
-     for (ll in 1:length(markPoints)) {
-       pos <- markPoints[[ll]][j,]
-       points(timesPos[pos], edist[pos], pch="O", col="red", cex=1.5)
-     }
+    plot(timesPos, edist, main=maintext)
+    points(timesPos[mpos], val, pch=2, col="blue")
+    for (ll in 1:length(markPoints)) {
+      pos <- markPoints[[ll]][j,]
+      points(timesPos[pos], edist[pos], pch="O", col="red", cex=1.5)
+    }
 
   }
   if (pause) {

@@ -1,6 +1,6 @@
 
 
-plot.spectra <- function(data, labels, window, bt=1, tp=NA, average=F, erb=F, doColor=True, doLty=True, labLty=NULL, labColors=NULL, xlab="Frequency(Hz)", ylab="Magnitude (dB)", ... )
+plot.spectra <- function(data, labels, window, bt=1, tp=NA, average=FALSE, erb=FALSE, doColor=TRUE, doLty=TRUE, labLty=NULL, labColors=NULL, xlab="Frequency(Hz)", ylab="Magnitude (dB)", ... )
 {
 
   ## figure out the sampling frequency
