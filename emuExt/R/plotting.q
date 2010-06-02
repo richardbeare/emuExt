@@ -289,9 +289,24 @@ plotAveTracks <- function(tracks, labels=stop("Labels must be present for averag
     invisible()
   }
 
+createLabColors <- function(labels)
+  {
+    ## creates a vector of labels suitable for plotXYTrack and plotXYAveTrack
+    distinct.colors <- colors()[c(552, 257, 26, 68, 450, 91, 81, 31, 36,
+                                490, 656, 642, 572, 639, 587, 96, 614,
+                                476, 506, 429, 594, 117, 12,
+                                563, 633, 461, 645, 84, 640, 556)]
+    if (length(labels) > length(distinct.colors)) {
+      stop("Not enough colours")
+    }
+    result <- distinct.colors[1:length(labels)]
+    names(result) <- labels
+    return(result)
+  }
+
 plotXYTrack <- function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "", 
     main = "", legn = "tl", velMarkers = TRUE, markStart = TRUE, 
-    palaisX = NULL, palaisY = NULL) 
+    palaisX = NULL, palaisY = NULL, doColor=TRUE, labColours=NULL) 
 {
     if ((class(tracksx) != "trackdata") | (class(tracksy) != 
         "trackdata")) {
@@ -322,13 +337,39 @@ plotXYTrack <- function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "",
         yrange <- range(c(tracksy$data[tt], palaisY))
     }
     NROWS <- nrow(tracksx$index)
-    if (is.null(labels)) {
+    if (doColor) {
+      if (is.null(labels)) {
         ThisColor <- rep(1, NROWS)
-    }
-    else {
+      } else {
         ULabs <- unique(labels)
-        ThisColor <- match(labels, ULabs)
+        if (is.null(labColours)) {
+          ## use some default colours. These aren't going to match labels between plots  
+          ThisColor <- match(labels, ULabs)
+        } else {
+          ## use a user defined set of labels. This should be a vector of colour indexes
+          ## with names corresponding to labels. Use createLabColors(labels)
+          ThisColor <- labColours[labels]
+        }
+      }
+    } else {
+      if (!is.null(labels))
+        ULabs <- unique(labels)
+      ThisColor <- rep(1, NROWS)
     }
+
+    if (is.null(labels)) {
+      plotChar <- rep(1, NROWS)
+    } else {
+      if (is.null(labColours)) {
+         plotChar <- 1:length(ULabs)
+      } else {
+         dd <- 1:length(labColours)
+         names(dd) <- names(labColours)
+         plotChar <- dd[labels]
+      }
+    }
+    
+    
     plot(tracksx[1, 1]$data, tracksy[1, 1]$data, xlim = xrange, 
         ylim = yrange, xlab = xlab, ylab = ylab, main = main, 
         type = "n")
@@ -340,7 +381,7 @@ plotXYTrack <- function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "",
             ddx <- tracksx$data[StartI[r]:EndI[r], c]
             ddy <- tracksy$data[StartI[r]:EndI[r], c]
             lines(ddx, ddy, col = ThisColor[r])
-            points(ddx, ddy, col = ThisColor[r], pch = ThisColor[r])
+            points(ddx, ddy, col = ThisColor[r], pch = plotChar[r])
             if (markStart) {
                 text(ddx[1], ddy[1], labels = "s", col = ThisColor[r], 
                   pos = 2)
@@ -364,11 +405,11 @@ plotXYTrack <- function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "",
     LegPos <- mu.legend(legn, xrange, yrange)
     if (!is.null(labels)) {
         if (velMarkers) {
-            legend(LegPos$x, LegPos$y, ULabs, col = 1:length(ULabs), 
-                pch = 1:length(ULabs), lty = 1)
+            legend(LegPos$x, LegPos$y, ULabs, col = ThisColor, 
+                pch = plotChar, lty = 1)
         }
         else {
-            legend(LegPos$x, LegPos$y, ULabs, col = 1:length(ULabs), 
+            legend(LegPos$x, LegPos$y, ULabs, col = ThisColor, 
                 lty = 1)
         }
     }
@@ -377,7 +418,7 @@ plotXYTrack <- function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "",
 plotXYAveTrack <- function (tracksx, tracksy, labels = stop("Labels must be present for averaging"), 
     xlab = "", ylab = "", main = "", legn = "tl", velMarkers = TRUE, 
     markStart = TRUE, samples = 20, normlength = 100, palaisX = NULL, 
-    palaisY = NULL) 
+    palaisY = NULL, doColor=TRUE, labColours=NULL) 
 {
     aveX <- aveTracks(tracksx, labels = labels, samples = samples, 
         normlength = normlength)
@@ -389,5 +430,55 @@ plotXYAveTrack <- function (tracksx, tracksy, labels = stop("Labels must be pres
     }
     plotXYTrack(aveX$track, aveY$track, aveX$labels, xlab = xlab, 
         ylab = ylab, main = main, velMarkers = velMarkers, markStart = markStart, 
-        legn = legn, palaisX = palaisX, palaisY = palaisY)
+        legn = legn, palaisX = palaisX, palaisY = palaisY, doColor=doColor, labColours=labColours)
+}
+
+
+euclidDist <- function(xdata, ydata, toplip, bottomlip, 
+                       LabelList=NULL, timeMarks=list(NULL), pause=TRUE)
+{
+  freq <- diff(as.vector(xdata[1,1]$ftime))/1000
+  freq <- (diff(as.vector(xdata[1,1]$index)) + 1)/freq
+
+  markPoints <- list()
+  for (uu in 1:length(timeMarks)) {
+    markPoints[[uu]] <- (timeMarks[[uu]] - xdata$ftime[,1]) * freq/1000
+  }
+
+  if (pause) {
+    thisPar <- par(ask=TRUE)
+  }
+
+  result <- NULL
+  for (j in 1:nrow(xdata$ftime)) {
+     xt <- xdata[j, toplip]$data
+     yt <- ydata[j, toplip]$data
+     xb <- xdata[j, bottomlip]$data
+     yb <- ydata[j, bottomlip]$data
+     sampTime <- xdata[j, ]$ftime
+     timesPos <- seq(sampTime[1], sampTime[2], length = nrow(xt))
+     edist <- sqrt((xt - xb)^2 + (yt - yb)^2)
+     mpos <- which.min(edist)
+     val <- edist[mpos]
+     # return data
+     result <- rbind(result, c(val, timesPos[mpos]))
+     maintext <- paste("Token ", j, ":" )
+     if (!is.null(LabelList)) {
+       for (i in LabelList) {
+          maintext <- paste(maintext, i[j])
+       }
+     }
+
+     plot(timesPos, edist, main=maintext)
+     points(timesPos[mpos], val, pch=2, col="blue")
+     for (ll in 1:length(markPoints)) {
+       pos <- markPoints[[ll]][j,]
+       points(timesPos[pos], edist[pos], pch="O", col="red", cex=1.5)
+     }
+
+  }
+  if (pause) {
+    par(thisPar)
+  }
+  result
 }

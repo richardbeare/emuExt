@@ -31,8 +31,7 @@ findMaxMin <- function(xdata, ydata, doplot=TRUE)
        if (doplot) {
           rrx <- range(posX)
           rry <- range(posY)
-          plot(posX[,1], posY[,1], ylim=rry, xlim=rrx, type='n', main=paste("Token number", i))
-                    
+          plot(posX[,1], posY[,1], ylim=rry, xlim=rrx, type='n')
           for (k in sensors) {
             lines(posX[,k], posY[,k], col=k)
             points(posX[,k], posY[,k], col=k) 
