@@ -57,14 +57,14 @@ plot.spectra <- function(data, labels, window, bt=1, tp=NA, average=FALSE, erb=F
      }
 
      if (is.null(labLty)) {
-       labLty <- l:length(un)
+       labLty <- 1:length(un)
      }
      if (!doLty) {
        labLty <- rep(1, length(un))
      }
      
      matplot(f, 20*log10(avesignals), type='l', lty=labLty, col=labColors, xlab=xlab, ylab=ylab, ...)
-	legend(x="topright", legend=un, lty=labLty, col=labColors)
+     legend(x="topright", legend=un, lty=labLty, col=labColors)
      
   } else {
 	combsignals <- NULL
