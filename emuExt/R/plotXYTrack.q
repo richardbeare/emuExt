@@ -54,6 +54,15 @@ function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "",
                 text(ddx[1], ddy[1], labels = "s", col = ThisColor[r], 
                   pos = 2)
             }
+            if (markEnd) {
+                text(ddx[ll], ddy[ll], labels = "e", col = ThisColor[r], 
+                  pos = 2)
+            }
+            if (markMid) {
+                ll <- round(length(ddx)/2)
+                text(ddx[ll], ddy[ll], labels = "m", col = ThisColor[r], 
+                  pos = 2)
+            }
         }
     }
     else {
@@ -64,7 +73,15 @@ function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "",
             if (markStart) {
                 text(ddx[1], ddy[1], labels = "s", col = ThisColor[r], 
                   pos = 2)
+            if (markEnd) {
+                text(ddx[ll], ddy[ll], labels = "e", col = ThisColor[r], 
+                  pos = 2)
             }
+            if (markMid) {
+                ll <- round(length(ddx)/2)
+                text(ddx[ll], ddy[ll], labels = "m", col = ThisColor[r], 
+                  pos = 2)
+            }            }
         }
     }
     for (i in 1:ncol(tracksx$data)) {
