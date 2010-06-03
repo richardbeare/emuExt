@@ -307,7 +307,7 @@ createLabColors <- function(labels)
 plotXYTrack <- function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "", 
                          main = "", legn = "tl", velMarkers = TRUE, markStart = TRUE,
                          markEnd = TRUE, markMid = TRUE,
-                         palaisX = NULL, palaisY = NULL, doColor=TRUE, labColours=NULL) 
+                         palaisX = NULL, palaisY = NULL, doColor=TRUE, labColours=NULL, xmarg=0.1, ymarg=xmarg) 
 {
   if ((class(tracksx) != "trackdata") | (class(tracksy) != 
               "trackdata")) {
@@ -319,6 +319,15 @@ plotXYTrack <- function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "",
   if (ncol(tracksx$data) != ncol(tracksy$data)) {
     stop("Sample lengths must be identical\n")
   }
+
+  exprange <- function(rng, marg)
+    {
+      offset <- marg * abs(rng[2] - rng[1])
+      rng[1] <- rng[1] - offset
+      rng[2] <- rng[2] + offset
+      return(rng)
+    }
+  
   NewFtime <- tracksx$ftime - tracksy$ftime[, 1]
   IdxCount <- tracksx$index[, 2] - tracksx$index[, 1] + 1
   StartI <- tracksx$index[, 1]
@@ -330,6 +339,9 @@ plotXYTrack <- function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "",
   else {
     xrange <- range(c(tracksx$data[tt], palaisX))
   }
+
+  xrange <- exprange(xrange, xmarg)
+  
   tt <- !is.na(tracksy$data)
   if (is.null(palaisY)) {
     yrange <- range(tracksy$data[tt])
@@ -337,6 +349,10 @@ plotXYTrack <- function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "",
   else {
     yrange <- range(c(tracksy$data[tt], palaisY))
   }
+
+  yrange <- exprange(yrange, ymarg)
+  
+
   NROWS <- nrow(tracksx$index)
   if (doColor) {
     if (is.null(labels)) {
@@ -370,9 +386,8 @@ plotXYTrack <- function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "",
     }
   }
   
-  
-  plot(tracksx[1, 1]$data, tracksy[1, 1]$data, xlim = xrange, 
-       ylim = yrange, xlab = xlab, ylab = ylab, main = main, 
+  plot(tracksx[1, 1]$data, tracksy[1, 1]$data,
+       xlab = xlab, ylab = ylab, xlim=xrange, ylim=yrange, main = main, 
        type = "n")
   if (!is.null(palaisX) & !is.null(palaisY)) {
     lines(palaisX, palaisY)
@@ -438,8 +453,9 @@ plotXYTrack <- function (tracksx, tracksy, labels = NULL, xlab = "", ylab = "",
 
 plotXYAveTrack <- function (tracksx, tracksy, labels = stop("Labels must be present for averaging"), 
                             xlab = "", ylab = "", main = "", legn = "tl", velMarkers = TRUE, 
-                            markStart = TRUE, markEnd = TRUE, markMid = TRUE, samples = 20, normlength = 100, palaisX = NULL, 
-                            palaisY = NULL, doColor=TRUE, labColours=NULL) 
+                            markStart = TRUE, markEnd = TRUE, markMid = TRUE, samples = 20,
+                            normlength = 100, palaisX = NULL, 
+                            palaisY = NULL, doColor=TRUE, labColours=NULL, xmarg=0.1, ymarg=xmarg) 
 {
   aveX <- aveTracks(tracksx, labels = labels, samples = samples, 
                     normlength = normlength)
@@ -452,7 +468,7 @@ plotXYAveTrack <- function (tracksx, tracksy, labels = stop("Labels must be pres
   plotXYTrack(aveX$track, aveY$track, aveX$labels, xlab = xlab, 
               ylab = ylab, main = main, velMarkers = velMarkers, markStart = markStart,
               markEnd = markEnd, markMid=markMid,
-              legn = legn, palaisX = palaisX, palaisY = palaisY, doColor=doColor, labColours=labColours)
+              legn = legn, palaisX = palaisX, palaisY = palaisY, doColor=doColor, labColours=labColours, xmarg=xmarg, ymarg=ymarg)
 }
 
 
