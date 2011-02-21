@@ -30,7 +30,7 @@ plot.spectra <- function(data, labels, window, bt=1, tp=NA, average=FALSE, erb=F
   }
 
 
-  un <- unique(labels)
+  un <- sort(unique(labels))
 
   signals <- list()
 
