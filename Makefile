@@ -1,7 +1,7 @@
 # a makefile to create installations of tRMA
 
 windows:
-	mkdir tmp
+	mkdir -p tmp
 	R CMD build --force emuExt
 	R CMD INSTALL -l tmp emuExt_0.1.tar.gz
 	(cd tmp; zip -r emuExt.zip emuExt;mv emuExt.zip ../)

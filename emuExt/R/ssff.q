@@ -114,7 +114,7 @@ loadSamp <- function(name, path=NULL,
     }
 
     name <- basename(name)
-    nn <- gsub("\.s?art[tb]", "", name)
+    nn <- gsub("\\.s?art[tb]", "", name)
     tname <- paste(path, "/", nn, ".sartt", sep="")
     bname <- paste(path, "/", nn, ".sartb", sep="")
 

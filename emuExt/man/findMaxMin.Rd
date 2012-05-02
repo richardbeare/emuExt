@@ -25,7 +25,7 @@ The procedure is as follows:
 
 The user is prompted with the following message:
 
-"Press m to modify, enter to continue\n"
+"Press m to modify, enter to continue"
 
 If "m" is pressed then \code{identify} is used to extract positions.
 The user should first click on the position of the maximum and then on

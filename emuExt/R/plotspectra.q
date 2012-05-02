@@ -31,7 +31,7 @@ plot.spectra <- function(data, labels, window, bt=1, tp=NA, average=FALSE, erb=F
 
 
   un <- sort(unique(labels))
-
+  labColors <- labColors[as.character(un)]
   signals <- list()
 
   for (I in 1:length(un)) {
