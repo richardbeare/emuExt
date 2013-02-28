@@ -80,14 +80,19 @@ spectral.tilt <- function(dataset, lsweight=F, plotduring=T,
             
             if (do.moments) {
               FTdbn <- FTdb - min(FTdb)
-              prodvals <- FTdbn * fff
-              s1 <- sum(FTdbn)
-              s2 <- sum(prodvals)
-              first.moment <- s2/s1
+              #prodvals <- FTdbn * fff
+              #s1 <- sum(FTdbn)
+              #s2 <- sum(prodvals)
+              #first.moment <- s2/s1
 
-              sqrprodvals <- fsqr * FTdbn
-              second.moment <- sqrt(sum(sqrprodvals)/s1 - first.moment^2)
-              res.moment[[i]] <- c(first.moment, second.moment)
+              #sqrprodvals <- fsqr * FTdbn
+              #second.moment <- sqrt(sum(sqrprodvals)/s1 - first.moment^2)
+
+              #res.moment[[i]] <- c(first.moment, second.moment)
+
+              resm <- emu::moments(FTdbn, fff)
+              resm[2] <- sqrt(resm[2])
+              res.moment[[i]] <- resm
 ##              plot(f, FTdbn, type='l')
             }
             if (plotduring) {
@@ -105,7 +110,8 @@ spectral.tilt <- function(dataset, lsweight=F, plotduring=T,
         }
         if (do.moments) {
           res.moment <- unlist(res.moment)
-          dim(res.moment) <- c(2, length(res.moment)/2)
+          #dim(res.moment) <- c(2, length(res.moment)/2)
+          dim(res.moment) <- c(4, length(res.moment)/4)
         }
         list(res.tilt = res, res.moment=res.moment)
       }
