@@ -1,9 +1,11 @@
 Package: emuExt
-Version: 0.1
-Date: 2003-02-28
+Version: 0.2
+Date: 2014-12-18
 Title: Extensions for emu speech analysis. Written by Richard Beare for Marija Tabain
-Author: Written by Richard Beare for Marija Tabain
-Maintainer: Richard Beare <Richard.Beare@csiro.au>
-Depends: R (>= 1.5)
+Author: "Richard Beare <Richard.Beare@gmail.com>"
+Maintainer: Richard Beare <Richard.Beare@gmail.com>
+Depends: R (>= 3)
 Description: Some functions that extend the functionality of EMU. Spectral tilt, smoothing, some plotting etc. 
+Imports:
+	emu
 License: To be decided
