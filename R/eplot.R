@@ -133,8 +133,8 @@ ylim, colour = T,
                  1)
       yat <- seq(yaxp[1], yaxp[2], length.out = yaxp[3] +
                  1)
-      axis(1, at = xat, label = -xat)
-      axis(2, at = yat, label = -yat, srt = 90)
+      axis(1, at = xat, labels = -xat)
+      axis(2, at = yat, labels = -yat, srt = 90)
     }
     else {
       axis(1)

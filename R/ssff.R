@@ -310,7 +310,7 @@ showPoints <- function(signal)
     
     mall <- t(m1A)
     plot(mall, type='n')
-    PP<<-mall
+    ##PP<<-mall
     cc <- c(rep('black', 8), rep('red',2))
     text(mall, paste(1:nrow(mall)),col=cc)
     lines(mall[9:10,])

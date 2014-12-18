@@ -70,7 +70,7 @@ plot.running.spectra <- function(data, labs, this.lab=NULL, window=12, frameshif
       default.array[,,I] <- default.slice
     }
     cc <- apply(default.array, MARGIN=c(1,2), mean, na.rm=T)
-    require(lattice)
+    #require(lattice)
     cloud(20*log10(cc), xlab="freq", ylab="window number", zlab="Mag(dB)",
               scales=list(x=f, y=1:maxcols, arrows=F), type='l')
     return(cc)
