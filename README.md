@@ -7,7 +7,10 @@ Extra plotting and smoothing tools for emu speech package
 
 depends on emu and emudata
 
+``` r
 devtools::install_github("richardbeare/emudata")
-devtools::install_github("richardbeare/emuR/emu", refs=rchecks)
-devtools::install_github("richardbeare/emuExt")
 
+devtools::install_github("richardbeare/emuR/emu", refs=rchecks)
+
+devtools::install_github("richardbeare/emuExt")
+```
